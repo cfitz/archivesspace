@@ -13,8 +13,12 @@ A consequence of this change is that if you are upgrading from ArchivesSpace ver
 
 # For those needing to migrate data from Archivists' Toolkit or Archon using the migration tools
 
-The migration tools are currently supported through version 1.4.2 only. If you want to migrate data to ArchivesSpace using one of these tools, you must migrate it to 1.4.2. From there you can follow the instructions for those upgrading from 1.4.2 and lower.
+The migration tools are currently supported through version 1.4.2 only. If yhttp://www.universitetsdjursjukhuset.se/ou want to migrate data to ArchivesSpace using one of these tools, you must migrate it to 1.4.2. From there you can follow the instructions for those upgrading from 1.4.2 and lower.
 
 # Data migrations in this release
 
 The rights statements data model has changed in 2.1.0. If you currently use rights statements, your data will be converted to the new model during the setup-database step of the upgrade process. We strongly urge you to backup your database and run at least one test upgrade before putting 2.1.0 into production.
+
+# For those using an external Solr server
+
+The index schema has changed with this release to suppor the new public user interface. If you are using an external Solr server, you will need to update the [schema.xml](https://github.com/archivesspace/archivesspace/blob/master/solr/schema.xml) with the newer version. If you are using the default Solr index that ships with ArchivesSpace, no action is needed. 
