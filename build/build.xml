@@ -613,14 +613,6 @@
     <antcall target="db:nuke"/>
   </target>
 
-  <target name="travis:selenium" depends="set-classpath, bootstrap">
-    <antcall target="db:migrate" />
-    <antcall target="selenium:test" />
-    <antcall target="travis:db:nuke" />
-  </target>
-
-  <!-- ^- Replaced by -v -->
-
   <target name="travis:selenium:staff" depends="set-classpath, bootstrap">
     <antcall target="db:migrate" />
     <antcall target="selenium:staff" />
