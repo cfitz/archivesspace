@@ -107,10 +107,9 @@ describe "Collection Management" do
 
     @driver.find_element(:css => '.record-pane h2').text.should eq("#{@accession_title} Accession")
     expect {
-      @driver.find_element_with_text('//div[contains(@class, "error")]', /Processing hrs\/unit Estimate - Must be a number with no more than nine digits and five decimal places\./)
-      @driver.find_element_with_text('//div[contains(@class, "error")]', /Processing Total Extent - Must be a number with no more than nine digits and five decimal places\./)
-    }.to raise_error
-
+      @driver.find_element_with_text('//div[contains(@class, "error")]', /Processing hrs\/unit Estimate - Must be a number with no more than nine digits and five decimal places\./, false, true)
+      @driver.find_element_with_text('//div[contains(@class, "error")]', /Processing Total Extent - Must be a number with no more than nine digits and five decimal places\./, false, true)
+    }.to raise_error(Selenium::WebDriver::Error::NoSuchElementError)
 
   end
 end

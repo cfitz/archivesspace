@@ -148,7 +148,7 @@ module Selenium
         try = 0
         while true
           begin
-            elt = self.find_element(*selectors)
+            elt = self.find_element_orig(*selectors)
             return elt
           rescue Selenium::WebDriver::Error::NoSuchElementError
             puts "#{test_group_prefix}find_element failed: trying to turn the page"
@@ -341,13 +341,16 @@ return (
 
         begin
           self.find_element(:tag_name => "body").find_element_with_text(xpath, pattern, noError, noRetry)
-        rescue Selenium::WebDriver::Error::StaleElementReferenceError
-          if tries < Selenium::Config.retries
+        rescue Selenium::WebDriver::Error::StaleElementReferenceError => e
+          if tries < Selenium::Config.retries && !noRetry
             tries += 1
             $sleep_time += 0.1
             sleep 0.1
-
             retry
+          elsif noError
+            return nil
+          else
+            raise e
           end
         end
       end
@@ -382,16 +385,33 @@ return (
         raise Selenium::WebDriver::Error::NoSuchElementError
       end
 
+      # adds to an input and selects a type ahead
+      def typeahead_and_select(token_input, value, retries = 10 )
+        token_input.clear
+        # token_input.click
+        token_input.send_keys(value)
+        if token_input["value"] == value
+          begin
+            find_element_orig(:css, "li.token-input-dropdown-item2").click
+          rescue Selenium::WebDriver::Error::NoSuchElementError => e
+            sleep 2
+            retry if ( retries -= 1 ) > 0
+            raise e
+          end
+        else
+          typeahead_and_select(token_input, value, retries - 1 )        
+        end 
+      end
 
       def open_rde_add_row_dropdown
         modal = self.find_element(:id => "rapidDataEntryModal")
-        3.times do
+        3.times do |try|
           begin 
             modal.find_element(:css, ".btn.add-rows-dropdown").click
             modal.find_element_orig(:css => '.add-rows-form input').click
             break 
           rescue
-            $stderr.puts "hmmm...can't find the input..lets try and reopen the dropdown.. " 
+            # $stderr.puts "hmmm...can't find the input..lets try and reopen the dropdown.. " 
             next 
           end 
         end
@@ -478,18 +498,22 @@ return (
 
       def find_element_with_text(xpath, pattern, noError = false, noRetry = false)
         Selenium::Config.retries.times do |try|
-          matches = self.find_elements(:xpath => xpath)
-
           begin
+            matches = self.find_elements(:xpath => xpath)
             matches.each do | match |
               return match if match.text.chomp.strip =~ pattern
             end
-          rescue
+          rescue => e
+            return nil if noError && noRetry
+            raise e if noRetry
             # Ignore exceptions and retry
           end
 
+          # we got here and there's nothing..
+          # raise an error unless we're told not to
           if noRetry
-            return nil
+            return nil if noError
+            raise Selenium::WebDriver::Error::NoSuchElementError
           end
 
           $sleep_time += 0.1

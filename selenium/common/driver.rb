@@ -68,7 +68,7 @@ class Driver
                           :extensions_to_open => "",
                           :prompt_for_download => false
                         }},
-              :args => %w[ headless disable-gpu window-size=1200x800]  
+              :args => %w[ headless  disable-gpu window-size=1200x800]  
             )
     return Selenium::WebDriver.for :chrome, :options => opts
   end
