@@ -392,13 +392,14 @@ return (
         token_input.send_keys(value)
         if token_input["value"] == value
           begin
+            wait_for_dropdown 
             find_element_orig(:css, "li.token-input-dropdown-item2").click
           rescue Selenium::WebDriver::Error::NoSuchElementError => e
-            sleep 2
+            sleep 1
             retry if ( retries -= 1 ) > 0
             raise e
           end
-        else
+        else # for whatever reason, the input didn't get put in correctly, so let's try again
           typeahead_and_select(token_input, value, retries - 1 )        
         end 
       end
